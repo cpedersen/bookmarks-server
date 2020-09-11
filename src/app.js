@@ -4,7 +4,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
-const { v4: uuid } = require('uuid');
+const { v4: uuid } = require('uuid')
 const bookmarksRouter = require('./bookmarks/bookmarks-router')
 
 /* -------------------------------------------------------- */
