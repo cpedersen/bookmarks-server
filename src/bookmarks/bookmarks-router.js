@@ -9,14 +9,16 @@ const bodyParser = express.json()
 /* -------------------------------------------------------- */
 /*                    BOOKMARKS                             */
 /* -------------------------------------------------------- */
+
 bookmarksRouter
   .route('/bookmarks')
   .get((req, res) => {
     res
       .json(bookmarks);
   })
-  .post((req, res) => {
-    const { title, url, description, rating } = req.body;
+  .post(bodyParser, (req, res) => {
+    console.log(req.body);
+    const { title, url, rating } = req.body;
     //const { title="CNN", url="http://www.cnn.com", description, rating="4" } = req.body;
     if (!title) {
       logger.error(`Title is required`);
@@ -43,7 +45,6 @@ bookmarksRouter
       id,
       title,
       url,
-      description,
       rating
     };
   
