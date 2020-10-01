@@ -6,6 +6,25 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const { v4: uuid } = require('uuid')
 const bookmarksRouter = require('./bookmarks/bookmarks-router')
+const winston = require('winston');
+
+
+/* -------------------------------------------------------- */
+/*                  Winston setup                           */
+/* -------------------------------------------------------- */
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'info.log' })
+  ]
+});
+
+if (NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple()
+  }));
+}
 
 /* -------------------------------------------------------- */
 /*                  Morgan setup                            */
