@@ -1,5 +1,5 @@
 INSERT INTO bookmarks (id, title, url, description, rating)
 VALUES
-    (1, 'CNN', 'https://www.cnn.com', '3', 'Liberal news media'),
-    (2, 'FOX', 'https://www.fox.com', '1', 'Conservative news media'),
-    (3, 'Market Watch', 'https://marketwatch.com', '5', 'Financial news');
+    (1, 'CNN', 'https://www.cnn.com', 'Liberal news media', '3'),
+    (2, 'FOX', 'https://www.fox.com', 'Conservative news media', '1'),
+    (3, 'Market Watch', 'https://marketwatch.com', 'Financial news', '5');

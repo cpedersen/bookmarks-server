@@ -8,6 +8,9 @@ const { v4: uuid } = require('uuid')
 const bookmarksRouter = require('./bookmarks/bookmarks-router')
 const winston = require('winston');
 
+//TODO - do I need the following?
+//const validateBearerToken = require('./validate-bearer-token')
+//const errorHandler = require('./error-handler')
 
 /* -------------------------------------------------------- */
 /*                  Winston setup                           */

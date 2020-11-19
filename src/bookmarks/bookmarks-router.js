@@ -1,7 +1,8 @@
 const express = require('express')
 const { v4: uuid } = require('uuid');
 const logger = require('../logger')
-const { bookmarks } = require('../store')
+//TODO - where find valid-url?
+//const { isWebUri } = require('valid-url')
 const BookmarksService = require('./bookmarks-service')
 
 const bookmarksRouter = express.Router()
@@ -10,12 +11,17 @@ const bodyParser = express.json()
 /* -------------------------------------------------------- */
 /*                    BOOKMARKS                             */
 /* -------------------------------------------------------- */
-
 bookmarksRouter
   .route('/bookmarks')
   .get((req, res) => {
-    res
-      .json(bookmarks);
+    BookmarksService.getBookmarks(req.app.get('db'))
+        .then(bookmarks => {
+            res.json(bookmarks.map(serializeBookmark))
+          })
+        .catch(error=>{console.log(error)})
+    
+    //res
+    //  .json(bookmarks);
   })
   .post(bodyParser, (req, res) => {
     console.log(req.body);
@@ -39,6 +45,17 @@ bookmarksRouter
         .status(400)
         .send('Invalid data');
     }
+    //TODO - tighten the above
+    /*for (const field of ['title', 'url', 'rating']) {
+      if (!req.body[field]) {
+        logger.error(`${field} is required`)
+        return res.status(400).send(`'${field}' is required`)
+      }
+    }*/
+
+
+    //TODO - improve the following 
+
     // get an id
     const id = uuid();
   
@@ -63,21 +80,25 @@ bookmarksRouter
 /*                   BOOKMARKS ID                           */
 /* -------------------------------------------------------- */
 bookmarksRouter
-.route('/bookmarks/:id')
-.get((req, res) => {
+  .route('/bookmarks/:id')
+  .get((req, res) => {
     const { id } = req.params;
-    const bookmark = bookmarks.find(c => c.id == id);
-  
-    // make sure we found a bookmark
-    if (!bookmark) {
-      logger.error(`Bookmark with id ${id} not found.`);
-      return res
-        .status(404)
-        .send('Bookmark Not Found');
-    }
-  
-    res.json(bookmark);
+    //const bookmark = bookmarks.find(c => c.id == id);
+    BookmarksService.getById(req.app.get('db'), id)
+        .then(bookmark => {
+          // make sure we found a bookmark
+          if (!bookmark) {
+            logger.error(`Bookmark with id ${id} not found.`);
+            res
+            .status(404)
+            .send('Bookmark Not Found');
+          }
+          res.json(bookmark)
+        })
+        .catch(error=>{console.log(error)})
 })
+
+//TODO - use BookmarksService
 .delete((req, res) => {
     const { id } = req.params;
   
