@@ -1,4 +1,3 @@
-//const { expect } = require('chai')
 const knex = require('knex')
 const app = require('../src/app')
 
@@ -26,21 +25,21 @@ describe.only('Bookmarks Endpoints', function() {
         title: 'CNN',
         url: 'https://www.cnn.com',
         description: 'Neo-liberal news source',
-        rating: "3"
+        rating: 3
       },
       {
         id: 2,
         title: 'FOX',
         url: 'https://www.fox.com',
         description: 'Right wing news source',
-        rating: "1"
+        rating: 1
       },
       {
         id: 3,
         title: 'Market Watch',
         url: 'https://www.marketwatch.com',
         description: 'Financial news',
-        rating: "5"
+        rating: 5
       },
     ];
 
