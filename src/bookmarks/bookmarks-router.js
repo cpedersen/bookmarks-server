@@ -43,11 +43,12 @@ bookmarksRouter
     
     //Store all fields in req.body
     const { title, url, description, rating } = req.body
+    const ratingNum = Number(rating)
 
     //Check rating value
-    if (!Number.isInteger(rating) || rating < 0 || rating > 5) {
-      logger.error(`Invalid rating '${rating}' supplied`)
-      return res.status(400).send(`'rating' must be a number between 0 and 5`)
+    if (!Number.isInteger(ratingNum) || ratingNum < 0 || ratingNum > 5) {
+      logger.error(`Invalid rating '${ratingNum}'`)
+      return res.status(400).send(`'rating' must be between 0 and 5`)
     }
 
     //Check url format
@@ -107,7 +108,7 @@ bookmarksRouter
         bookmark_id
     )
       .then(numRowsAffected => {
-        logger.info(`Card with id ${bookmark_id} deleted`)
+        logger.info(`Bookmark with id ${bookmark_id} deleted`)
         res.status(204).end()
       })
       .catch(next)
