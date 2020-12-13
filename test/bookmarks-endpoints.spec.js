@@ -2,7 +2,7 @@ const knex = require('knex')
 const fixtures = require('./bookmarks-fixtures')
 const app = require('../src/app')
 
-describe.only('Bookmarks Endpoints', function() {
+describe('Bookmarks Endpoints', function() {
   let db
 
   before('make knex instance', () => {
@@ -68,7 +68,7 @@ describe.only('Bookmarks Endpoints', function() {
   })
 
   /* -------------------------------------------------------- */
-  /*                 GET /bookmarks                           */
+  /*             GET /api/bookmarks                           */
   /* -------------------------------------------------------- */
   describe('GET /api/bookmarks', () => {
     //Given no bookmarks (200 = ok)
@@ -123,7 +123,7 @@ describe.only('Bookmarks Endpoints', function() {
   }) 
 
   /* -------------------------------------------------------- */
-  /*           GET /bookmarks/:bookmark_id                    */
+  /*        GET /api/bookmarks/:bookmark_id                   */
   /* -------------------------------------------------------- */
   describe('GET /api/bookmarks/:id', () => {
     //Given no bookmarks (404 = not found)
@@ -133,7 +133,7 @@ describe.only('Bookmarks Endpoints', function() {
           .get(`/api/bookmarks/123`)
           .set('Authorization', 'bearer ' + process.env.API_TOKEN)
           .expect(404, {
-            error: { message: `Bookmark not found` }
+            error: { message: `Bookmark Not Found` }
           })
       })
     })
@@ -161,19 +161,19 @@ describe.only('Bookmarks Endpoints', function() {
     //Handle XSS attack
     context(`Given an XSS attack bookmark`, () => {
       const { maliciousBookmark, expectedBookmark } = fixtures.makeMaliciousBookmark()
-
       beforeEach('insert malicious bookmark', () => {
         return db
-          .into('/api/bookmarks')
+          .into('bookmarks')
           .insert([maliciousBookmark])
       })
-
+      
       it('removes XSS attack content', () => {
         return supertest(app)
           .get(`/api/bookmarks/${maliciousBookmark.id}`)
           .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
           .expect(200)
           .expect(res => {
+            console.log("DEBUG " + res.body.title)
             expect(res.body.title).to.eql(expectedBookmark.title)
             expect(res.body.description).to.eql(expectedBookmark.description)
           })
