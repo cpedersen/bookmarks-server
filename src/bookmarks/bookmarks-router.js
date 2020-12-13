@@ -32,12 +32,12 @@ bookmarksRouter
         .catch(next)
   })
   .post(bodyParser, (req, res, next) => {
-    //console.log(req.body);
+    console.log(req.body);
     //Add checks that required fields are provided
     for (const field of ['title', 'url', 'rating']) {
       if (!req.body[field]) {
         logger.error(`${field} is required`)
-        return res.status(400).send(`${field} is required`)
+        return res.status(400).json({error: { message: `'${field}' is required` }})
       }
     }
     
@@ -48,13 +48,14 @@ bookmarksRouter
     //Check rating value
     if (!Number.isInteger(ratingNum) || ratingNum < 0 || ratingNum > 5) {
       logger.error(`Invalid rating '${ratingNum}'`)
-      return res.status(400).send(`'rating' must be between 0 and 5`)
+      return res.status(400).json({error: { message: `'rating' must be a number between 0 and 5` }}) 
     }
 
     //Check url format
     if (!isWebUri(url)) {
       logger.error(`Invalid url '${url}' supplied`)
-      return res.status(400).send(`'url' must be a valid URL`)
+      //return res.status(400).send(`'url' must be a valid URL`)
+      return res.status(400).json({error: {message: `'url' must be a valid URL`}})
     }
 
     //Store all fields in newBookmark var
@@ -92,7 +93,7 @@ bookmarksRouter
             //console.log("bookmark not found");
             logger.error(`Bookmark with id ${bookmark_id} not found`);
             return res.status(404).json({ 
-              error: {message: `Bookmark not found`}
+              error: {message: `Bookmark Not Found`}
             })
           }
           // Set the correct bookmark
