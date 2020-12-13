@@ -7,26 +7,11 @@ const { NODE_ENV } = require('./config')
 const validateBearerToken = require('./validate-bearer-token')
 const errorHandler = require('./error-handler')
 const bookmarksRouter = require('./bookmarks/bookmarks-router')
-const winston = require('winston');
 
+/* -------------------------------------------------------- */
+/*                 Express setup                            */
+/* -------------------------------------------------------- */
 const app = express()
-
-/* -------------------------------------------------------- */
-/*                  Winston setup                           */
-/* -------------------------------------------------------- */
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.File({ filename: 'info.log' })
-  ]
-});
-
-if (NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple()
-  }));
-}
 
 /* -------------------------------------------------------- */
 /*                  Morgan setup                            */
@@ -43,7 +28,6 @@ app.use(morgan((NODE_ENV === 'production') ? 'tiny' : 'common', {
   skip: () => NODE_ENV === 'test'
 }))
 
-
 /* -------------------------------------------------------- */
 /*                  Other setup                             */
 /* -------------------------------------------------------- */
@@ -54,7 +38,6 @@ app.use(validateBearerToken)
 /* -------------------------------------------------------- */
 /*        Set router after validateBearerToken              */
 /* -------------------------------------------------------- */
-app.use(bookmarksRouter)
 app.use('/api/bookmarks', bookmarksRouter)
 
 /* -------------------------------------------------------- */

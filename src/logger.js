@@ -1,7 +1,9 @@
 const winston = require('winston')
 const { NODE_ENV } = require('./config')
 
-  // set up winston
+/* -------------------------------------------------------- */
+/*                  Winston setup                           */
+/* -------------------------------------------------------- */
   const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
@@ -17,3 +19,6 @@ const { NODE_ENV } = require('./config')
   }
 
   module.exports = logger
+
+
+s
