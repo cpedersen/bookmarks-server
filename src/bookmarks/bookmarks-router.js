@@ -100,10 +100,10 @@ bookmarksRouter
           next()
         })
         .catch(next)
-})
+  })
   .get((req, res) => {
-  res.json(serializeBookmark(res.bookmark))
-})
+    res.json(serializeBookmark(res.bookmark))
+  })
   .delete((req, res, next) => {
     const { bookmark_id } = req.params;
     //Delete bookmark in the DB
