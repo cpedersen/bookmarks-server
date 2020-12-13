@@ -55,6 +55,7 @@ app.use(validateBearerToken)
 /*        Set router after validateBearerToken              */
 /* -------------------------------------------------------- */
 app.use(bookmarksRouter)
+app.use('/api/bookmarks', bookmarksRouter)
 
 /* -------------------------------------------------------- */
 /*                         GET /                            */
