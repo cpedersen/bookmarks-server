@@ -7,7 +7,6 @@ const BookmarksService = require('./bookmarks-service')
 
 const bookmarksRouter = express.Router()
 const bodyParser = express.json()
-const jsonParser = express.json()
 
 /* -------------------------------------------------------- */
 /*                 SERIALIZE BOOKMARKS                      */
@@ -117,7 +116,7 @@ bookmarksRouter
       })
       .catch(next)
   })
-  .patch(jsonParser, (req, res, next) => {
+  .patch(bodyParser, (req, res, next) => {
     const { title, url, description, rating } = req.body
     const bookmarkToUpdate = { title, url, description, rating }
 
