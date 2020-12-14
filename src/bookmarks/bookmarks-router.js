@@ -1,9 +1,11 @@
+const path = require('path')
 const express = require('express')
-const { v4: uuid } = require('uuid');
-const logger = require('../logger')
-const { isWebUri } = require('valid-url')
 const xss = require('xss')
+const logger = require('../logger')
 const BookmarksService = require('./bookmarks-service')
+
+const { v4: uuid } = require('uuid');
+const { isWebUri } = require('valid-url')
 
 const bookmarksRouter = express.Router()
 const bodyParser = express.json()
@@ -23,7 +25,7 @@ const serializeBookmark = bookmark => ({
 /*              BOOKMARKS - get all, post                       */
 /* -------------------------------------------------------- */
 bookmarksRouter
-  .route('/api/bookmarks')
+  .route('/')
   .get((req, res, next) => {
     BookmarksService.getBookmarks(req.app.get('db'))
         .then(bookmarks => {
@@ -33,16 +35,17 @@ bookmarksRouter
   })
   .post(bodyParser, (req, res, next) => {
     console.log(req.body);
+    //Store all fields in req.body
+    const { title, url, description, rating } = req.body
+    const newBookmark = { title, url, description, rating }
+
     //Add checks that required fields are provided
     for (const field of ['title', 'url', 'rating']) {
-      if (!req.body[field]) {
+      if (!newBookmark[field]) {
         logger.error(`${field} is required`)
         return res.status(400).json({error: { message: `'${field}' is required` }})
       }
     }
-    
-    //Store all fields in req.body
-    const { title, url, description, rating } = req.body
     const ratingNum = Number(rating)
 
     //Check rating value
@@ -57,9 +60,6 @@ bookmarksRouter
       //return res.status(400).send(`'url' must be a valid URL`)
       return res.status(400).json({error: {message: `'url' must be a valid URL`}})
     }
-
-    //Store all fields in newBookmark var
-    const newBookmark = { title, url, description, rating }
     
     //Create valid bookmark
     BookmarksService.insertBookmark(
@@ -81,7 +81,7 @@ bookmarksRouter
 /*      BOOKMARKS ID - all, get id, delete, patch           */
 /* -------------------------------------------------------- */
 bookmarksRouter
-  .route('/api/bookmarks/:bookmark_id')
+  .route('/:bookmark_id')
   .all((req, res, next) => {
     const { bookmark_id } = req.params;
     //console.log("bookmark_id: " + bookmark_id);
@@ -90,7 +90,6 @@ bookmarksRouter
           // Make sure we found a bookmark
           //console.log("bookmark: " + bookmark);
           if (!bookmark) {
-            //console.log("bookmark not found");
             logger.error(`Bookmark with id ${bookmark_id} not found`);
             return res.status(404).json({ 
               error: {message: `Bookmark Not Found`}

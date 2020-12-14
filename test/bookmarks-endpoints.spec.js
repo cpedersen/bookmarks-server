@@ -123,7 +123,7 @@ describe('Bookmarks Endpoints', function() {
   }) 
 
   /* -------------------------------------------------------- */
-  /*        GET /api/bookmarks/:bookmark_id                   */
+  /*        GET /api/bookmarks/:bookmark_id - FAIL (3 out of 3)                  */
   /* -------------------------------------------------------- */
   describe('GET /api/bookmarks/:id', () => {
     //Given no bookmarks (404 = not found)
@@ -131,7 +131,7 @@ describe('Bookmarks Endpoints', function() {
       it(`responds with 404 when no bookmark found`, () => {
         return supertest(app)
           .get(`/api/bookmarks/123`)
-          .set('Authorization', 'bearer ' + process.env.API_TOKEN)
+          .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
           .expect(404, {
             error: { message: `Bookmark Not Found` }
           })
@@ -153,7 +153,7 @@ describe('Bookmarks Endpoints', function() {
         const expectedBookmark = testBookmarks[bookmarkId - 1]
         return supertest(app)
             .get(`/api/bookmarks/${bookmarkId}`)
-            .set('Authorization', 'bearer ' + process.env.API_TOKEN)
+            .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
             .expect(200, expectedBookmark)
       })
     })
@@ -182,7 +182,7 @@ describe('Bookmarks Endpoints', function() {
   })
   
   /* -------------------------------------------------------- */
-  /*            POST /api/bookmarks/                          */
+  /*            POST /api/bookmarks/ - FAIL (1 out of 7)                        */
   /* -------------------------------------------------------- */
   describe('POST /api/bookmarks', () => {
     // title error
@@ -208,8 +208,8 @@ describe('Bookmarks Endpoints', function() {
       }
       return supertest(app)
         .post(`/api/bookmarks`)
-        .send(newBookmarkMissingUrl)
         .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+        .send(newBookmarkMissingUrl)
         .expect(400, {
           error: { message: `'url' is required` }
         })
@@ -223,8 +223,8 @@ describe('Bookmarks Endpoints', function() {
       }
       return supertest(app)
         .post(`/api/bookmarks`)
-        .send(newBookmarkMissingRating)
         .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+        .send(newBookmarkMissingRating)
         .expect(400, {
           error: { message: `'rating' is required` }
         })
@@ -255,15 +255,15 @@ describe('Bookmarks Endpoints', function() {
       }
       return supertest(app)
         .post(`/api/bookmarks`)
-        .send(newBookmarkInvalidUrl)
         .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+        .send(newBookmarkInvalidUrl)
         .expect(400, {
           error: { message: `'url' must be a valid URL` }
         })
     })
 
     //POST bookmark (201 = created)
-    it.only('adds a new bookmark', () => {
+    it('adds a new bookmark', () => {
       const newBookmark = {
         title: 'test-title',
         url: 'https://test.com',
@@ -272,8 +272,8 @@ describe('Bookmarks Endpoints', function() {
       }
       return supertest(app)
         .post(`/api/bookmarks`)
-        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
         .send(newBookmark)
+        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
         .expect(201)
         .expect(res => {
           expect(res.body.title).to.eql(newBookmark.title)
@@ -285,8 +285,8 @@ describe('Bookmarks Endpoints', function() {
         })
         .then(res =>
           supertest(app)
-            .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
             .get(`/api/bookmarks/${res.body.id}`)
+            .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
             .expect(res.body)
         )
     })
@@ -307,7 +307,7 @@ describe('Bookmarks Endpoints', function() {
   })
 
   /* -------------------------------------------------------- */
-  /*           DELETE /api/bookmarks/:bookmark_id             */
+  /*           DELETE /api/bookmarks/:bookmark_id (2 out of 2)             */
   /* -------------------------------------------------------- */
   describe('DELETE /api/bookmarks/:id', () => {
     //Given no bookmarks (404 = not found)
@@ -351,7 +351,7 @@ describe('Bookmarks Endpoints', function() {
   })
 
   /* -------------------------------------------------------- */
-  /*          PATCH /api/bookmarks:bookmark_id                */
+  /*          PATCH /api/bookmarks:bookmark_id - FAIL (1 out of 4)               */
   /* -------------------------------------------------------- */
   describe(`PATCH /api/bookmarks/:bookmark_id`, () => {
     context(`Given no bookmarks`, () => {
@@ -412,6 +412,7 @@ describe('Bookmarks Endpoints', function() {
         })
       })
 
+      //TODO - here is the failure
       it(`responds with 204 when updating only a subset of fields`, () => {
         const idToUpdate = 2
         const updatedBookmark = {
@@ -437,6 +438,8 @@ describe('Bookmarks Endpoints', function() {
               .expect(expectedBookmark)
           )
       })
+
+      //TODO - add more tests
     })
   })
 })
