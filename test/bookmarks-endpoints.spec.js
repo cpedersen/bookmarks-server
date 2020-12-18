@@ -31,39 +31,39 @@ describe('Bookmarks Endpoints', function() {
           .insert(testBookmarks)
     })
 
-    //GET /api/bookmarks
-    it(`responds with 200 and an empty list`, () => {
+    it(`responds with 401 Unauthorized for GET /api/bookmarks`, () => {
       return supertest(app)
         .get('/api/bookmarks')
-        .expect(401)
+        .expect(401, { error: 'Unauthorized request' })
     })
 
-    //GET /api/bookmarks/:id
-    it(`responds with 404 when no bookmark found`, () => {
+    it(`responds with 401 Unauthorized for POST /api/bookmarks`, () => {
       return supertest(app)
-        .get(`/api/bookmarks/123`)
-        .expect(401)
+        .post('/api/bookmarks')
+        .send({ title: 'test-title', url: 'http://some.thing.com', rating: 1 })
+        .expect(401, { error: 'Unauthorized request' })
     })
 
-    //DELETE /api/bookmarks/:id
-    it(`responds 404 when bookmark not found`, () => {
+    it(`responds with 401 Unauthorized for GET /api/bookmarks/:id`, () => {
+      const secondBookmark = testBookmarks[1]
       return supertest(app)
-        .delete(`/api/bookmarks/123`)
-        .expect(401)
+        .get(`/api/bookmarks/${secondBookmark.id}`)
+        .expect(401, { error: 'Unauthorized request' })
     })
 
-    //POST /api/bookmarks
-    it('adds a new bookmark', () => {
-      const newBookmark = {
-        title: 'test-title',
-        url: 'https://test.com',
-        description: 'test description',
-        rating: 1,
-      }
+    it(`responds with 401 Unauthorized for DELETE /api/bookmarks/:id`, () => {
+      const aBookmark = testBookmarks[1]
       return supertest(app)
-        .post(`/api/bookmarks`)
-        .send(newBookmark)
-        .expect(401)
+        .delete(`/api/bookmarks/${aBookmark.id}`)
+        .expect(401, { error: 'Unauthorized request' })
+    })
+
+    it(`responds with 401 Unauthorized for PATCH /api/bookmarks/:id`, () => {
+      const aBookmark = testBookmarks[1]
+      return supertest(app)
+        .patch(`/api/bookmarks/${aBookmark.id}`)
+        .send({ title: 'updated-title' })
+        .expect(401, { error: 'Unauthorized request' })
     })
   })
 
@@ -123,14 +123,15 @@ describe('Bookmarks Endpoints', function() {
   }) 
 
   /* -------------------------------------------------------- */
-  /*        GET /api/bookmarks/:bookmark_id - FAIL (3 out of 3)                  */
+  /*        GET /api/bookmarks/:bookmark_id                   */
   /* -------------------------------------------------------- */
   describe('GET /api/bookmarks/:id', () => {
     //Given no bookmarks (404 = not found)
     context(`Given no bookmarks`, () => {
       it(`responds with 404 when no bookmark found`, () => {
         return supertest(app)
-          .get(`/api/bookmarks/123`)
+          const bookmarkId = 123456
+          .get(`/api/bookmarks/${bookmarkId}`)
           .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
           .expect(404, {
             error: { message: `Bookmark Not Found` }
@@ -148,6 +149,7 @@ describe('Bookmarks Endpoints', function() {
             .insert(testBookmarks)
       })
 
+      //TODO - review expectedBookmark
       it('GET /api/bookmarks/:bookmark_id responds with 200 and the specified bookmark', () => {
         const bookmarkId = 2
         const expectedBookmark = testBookmarks[bookmarkId - 1]
@@ -185,6 +187,7 @@ describe('Bookmarks Endpoints', function() {
   /*            POST /api/bookmarks/ - FAIL (1 out of 7)                        */
   /* -------------------------------------------------------- */
   describe('POST /api/bookmarks', () => {
+
     // title error
     it(`responds with 400 missing 'title' if not supplied`, () => {
       const newBookmarkMissingTitle = {
@@ -312,9 +315,10 @@ describe('Bookmarks Endpoints', function() {
   describe('DELETE /api/bookmarks/:id', () => {
     //Given no bookmarks (404 = not found)
     context(`Given no bookmarks`, () => {
-      it(`responds 404 when bookmark not found`, () => {
+      it(`responds with 404 when bookmark not found`, () => {
         return supertest(app)
-          .delete(`/api/bookmarks/123`)
+          const bookmarkId = 123456
+          .delete(`/api/bookmarks/${bookmarkId}`)
           .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
           .expect(404, {
             error: { message: `Bookmark Not Found` }
@@ -412,10 +416,9 @@ describe('Bookmarks Endpoints', function() {
         })
       })
 
-      //TODO - here is the failure
       it(`responds with 204 when updating only a subset of fields`, () => {
         const idToUpdate = 2
-        const updatedBookmark = {
+        const updateBookmark = {
           title: 'updated bookmark title',
         }
         const expectedBookmark = {
@@ -439,7 +442,39 @@ describe('Bookmarks Endpoints', function() {
           )
       })
 
-      //TODO - add more tests
+      //TODO - get these 2 PATCH tests working
+      it(`responds with 400 invalid 'rating' if not between 0 and 5`, () => {
+        const idToUpdate = 2
+        const updateInvalidRating = {
+          rating: 'invalid',
+        }
+        return supertest(app)
+          .patch(`/api/bookmarks/${idToUpdate}`)
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+          .send(updateInvalidRating)
+          .expect(400, {
+            error: {
+              message: `'rating' must be a number between 0 and 5`
+            }
+          })
+      })
+
+      it(`responds with 400 invalid 'url' if not a valid URL`, () => {
+        const idToUpdate = 2
+        const updateInvalidUrl = {
+          url: 'htp://invalid-url',
+        }
+        return supertest(app)
+          .patch(`/api/bookmarks/${idToUpdate}`)
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+          .send(updateInvalidUrl)
+          .expect(400, {
+            error: {
+              message: `'url' must be a valid URL`
+            }
+          })
+      })
+      
     })
   })
 })
