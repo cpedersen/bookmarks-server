@@ -36,7 +36,7 @@ app.use(helmet())
 app.use(validateBearerToken)
 
 /* -------------------------------------------------------- */
-/*        Set router after validateBearerToken              */
+/*                   Set router                             */
 /* -------------------------------------------------------- */
 app.use('/api/bookmarks', bookmarksRouter)
 
@@ -52,5 +52,4 @@ app.get('/', (req, res) => {
 /* -------------------------------------------------------- */
 app.use(errorHandler)
   
-
 module.exports = app

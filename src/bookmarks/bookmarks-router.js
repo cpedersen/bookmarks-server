@@ -120,6 +120,7 @@ bookmarksRouter
   .patch(bodyParser, (req, res, next) => {
     const { title, url, description, rating } = req.body
     const bookmarkToUpdate = { title, url, description, rating }
+    console.log("bookmarkToUpdate: " + JSON.stringify(bookmarkToUpdate))
 
     const numberOfValues = Object.values(bookmarkToUpdate).filter(Boolean).length
     if (numberOfValues === 0)
@@ -128,6 +129,24 @@ bookmarksRouter
           message: `Request body must contain either 'title', 'url', 'description', or 'rating'`
         }
       })
+
+    if (rating) {
+      const ratingNum = Number(rating)
+      //Check rating value
+      if (!Number.isInteger(ratingNum) || ratingNum < 0 || ratingNum > 5) {
+        logger.error(`Invalid rating '${ratingNum}'`)
+        return res.status(400).json({error: { message: `'rating' must be a number between 0 and 5` }}) 
+      }
+    }
+
+    if (url) {
+      //Check url format
+      if (!isWebUri(url)) {
+        logger.error(`Invalid url '${url}' supplied`)
+        //return res.status(400).send(`'url' must be a valid URL`)
+        return res.status(400).json({error: {message: `'url' must be a valid URL`}})
+      }
+    }
 
     BookmarksService.updateBookmark(
       req.app.get('db'),
